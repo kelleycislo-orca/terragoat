@@ -104,5 +104,5 @@ resource "aws_instance" "pr_test_vm" {
 resource "aws_ebs_volume" "pr_test_vol" {
   availability_zone = "us-east-1a"
   size              = 10
-  encrypted         = false
+  encrypted         = true
 }
