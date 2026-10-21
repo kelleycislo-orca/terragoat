@@ -23,7 +23,13 @@ resource "aws_s3_bucket_public_access_block" "pr_test_data" {
   restrict_public_buckets = false
 }
 
-# Security group open to the world on SSH, RDP, and all ports
+variable "trusted_admin_cidr" {
+  description = "IPv4 CIDR block allowed to reach administrative ports (e.g. SSH). Must not be an unrestricted range."
+  type        = string
+  default     = "<TRUSTED_ADMIN_CIDR>"
+}
+
+# Security group open to the world on RDP; SSH restricted to the trusted admin CIDR
 resource "aws_security_group" "pr_test_wide_open" {
   name = "pr-test-wide-open"
 
@@ -31,7 +37,7 @@ resource "aws_security_group" "pr_test_wide_open" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.trusted_admin_cidr]
   }
   ingress {
     from_port   = 3389
@@ -43,7 +49,7 @@ resource "aws_security_group" "pr_test_wide_open" {
     from_port   = 0
     to_port     = 65535
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.trusted_admin_cidr]
   }
   egress {
     from_port   = 0
